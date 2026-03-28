@@ -3,6 +3,7 @@ package com.example.auth.controller;
 import com.example.auth.model.ApiResult;
 import com.example.auth.service.AuthApiClient;
 import com.example.auth.service.ClientValidationService;
+import com.example.auth.service.TokenPersistenceService;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -12,6 +13,15 @@ public class AuthController {
 
     @FXML
     private TextField serverUrlField;
+
+    @FXML
+    private TextField registerPathField;
+
+    @FXML
+    private TextField loginPathField;
+
+    @FXML
+    private CheckBox ssoModeCheckBox;
 
     @FXML
     private TextField registerEmailField;
@@ -51,15 +61,36 @@ public class AuthController {
     @FXML
     public void initialize() {
         serverUrlField.setText("http://localhost:8080");
-        apiClient = new AuthApiClient(serverUrlField.getText());
+        registerPathField.setText("/api/auth/register");
+        loginPathField.setText("/api/auth/login");
+        ssoModeCheckBox.setSelected(true);
+
+        rebuildApiClient();
+
+        String savedToken = TokenPersistenceService.getToken();
+        if (savedToken != null && !savedToken.isBlank()) {
+            apiClient.setAccessToken(savedToken);
+        }
 
         registerPasswordField.textProperty().addListener((obs, oldValue, newValue) -> updateStrength(newValue));
 
+        // Reconfigure le client dès qu'un champ réseau est modifié.
         serverUrlField.focusedProperty().addListener((obs, oldFocused, newFocused) -> {
-            if (!newFocused) {
-                apiClient = new AuthApiClient(serverUrlField.getText());
+            if (Boolean.FALSE.equals(newFocused)) {
+                rebuildApiClient();
             }
         });
+        registerPathField.focusedProperty().addListener((obs, oldFocused, newFocused) -> {
+            if (Boolean.FALSE.equals(newFocused)) {
+                rebuildApiClient();
+            }
+        });
+        loginPathField.focusedProperty().addListener((obs, oldFocused, newFocused) -> {
+            if (Boolean.FALSE.equals(newFocused)) {
+                rebuildApiClient();
+            }
+        });
+        ssoModeCheckBox.selectedProperty().addListener((obs, oldValue, newValue) -> rebuildApiClient());
 
         updateStrength("");
     }
@@ -114,7 +145,16 @@ public class AuthController {
             return;
         }
 
-        runAsync(loginButton, () -> apiClient.login(email, password), result -> setLoginStatus(result.message(), result.success()));
+        runAsync(loginButton, () -> apiClient.login(email, password), result -> {
+            setLoginStatus(result.message(), result.success());
+            if (result.success()) {
+                String token = apiClient.getAccessToken();
+                if (token != null) {
+                    TokenPersistenceService.saveToken(token);
+                }
+                loginPasswordField.clear();
+            }
+        });
     }
 
     private void updateStrength(String password) {
@@ -136,6 +176,19 @@ public class AuthController {
                 strengthBar.setProgress(1.0);
                 strengthBar.getStyleClass().add("strength-green");
             }
+        }
+    }
+
+    private void rebuildApiClient() {
+        String previousToken = apiClient == null ? TokenPersistenceService.getToken() : apiClient.getAccessToken();
+        apiClient = new AuthApiClient(
+                serverUrlField.getText(),
+                registerPathField.getText(),
+                loginPathField.getText(),
+                ssoModeCheckBox.isSelected()
+        );
+        if (previousToken != null && !previousToken.isBlank()) {
+            apiClient.setAccessToken(previousToken);
         }
     }
 
@@ -200,4 +253,3 @@ public class AuthController {
         void handle(ApiResult result);
     }
 }
-

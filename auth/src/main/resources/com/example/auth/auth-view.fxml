@@ -6,16 +6,34 @@
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.auth.controller.AuthController"
-            prefWidth="700.0" prefHeight="520.0"
+            prefWidth="760.0" prefHeight="560.0"
             stylesheets="@auth-style.css">
 
     <top>
         <VBox spacing="6.0" styleClass="card">
-            <Label text="Client Auth TP2 (FXML)" styleClass="title"/>
-            <HBox spacing="10.0" alignment="CENTER_LEFT">
-                <Label text="Backend URL:"/>
-                <TextField fx:id="serverUrlField" prefWidth="340.0" promptText="http://localhost:8080"/>
-            </HBox>
+            <Label text="Client Auth TP3 (FXML)" styleClass="title"/>
+            <GridPane hgap="10.0" vgap="8.0">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="130.0"/>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                </columnConstraints>
+
+                <Label text="Backend URL:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <TextField fx:id="serverUrlField" prefWidth="450.0" promptText="http://localhost:8080"
+                           GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                <Label text="Register path:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <TextField fx:id="registerPathField" promptText="/api/auth/register"
+                           GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                <Label text="Login path:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <TextField fx:id="loginPathField" promptText="/api/auth/login"
+                           GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                <Label text="Mode login:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                <CheckBox fx:id="ssoModeCheckBox" text="SSO TP3 (email + nonce + timestamp + hmac)"
+                          selected="true" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+            </GridPane>
         </VBox>
     </top>
 
@@ -25,7 +43,7 @@
                 <Tab text="Inscription">
                     <content>
                         <VBox spacing="12.0" styleClass="card">
-                            <Label text="Créer un compte" styleClass="subtitle"/>
+                            <Label text="Creer un compte" styleClass="subtitle"/>
 
                             <GridPane hgap="10.0" vgap="10.0">
                                 <columnConstraints>
@@ -38,7 +56,7 @@
                                            GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
                                 <Label text="Mot de passe" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                                <PasswordField fx:id="registerPasswordField" promptText="12+ car., maj, min, chiffre, spécial"
+                                <PasswordField fx:id="registerPasswordField" promptText="12+ car., maj, min, chiffre, special"
                                                GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
                                 <Label text="Confirmer mot de passe" GridPane.rowIndex="2" GridPane.columnIndex="0"/>

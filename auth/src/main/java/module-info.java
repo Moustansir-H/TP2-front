@@ -2,6 +2,7 @@ module com.example.auth {
     requires javafx.controls;
     requires javafx.fxml;
     requires java.net.http;
+    requires java.prefs;
 
     opens com.example.auth to javafx.fxml;
     opens com.example.auth.controller to javafx.fxml;
