@@ -12,7 +12,7 @@ public class HelloApplication extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("auth-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 760, 560);
-        stage.setTitle("TP3 - Client Auth");
+        stage.setTitle("TP4 - Client Auth");
         stage.setScene(scene);
         stage.show();
     }
